@@ -24,7 +24,7 @@ fn view(_model) {
   landing_page()
 }
 
-fn landing_page() {
+pub fn landing_page() {
   div([], [
     nav([], [
       ul([], [
