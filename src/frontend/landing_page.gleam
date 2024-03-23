@@ -1,6 +1,6 @@
 import lustre
 import lustre/element.{text}
-import lustre/element/html.{div, h1, nav, ul, li, img}
+import lustre/element/html.{div, h1, img, li, nav, ul}
 import lustre/attribute.{class, src}
 
 pub fn main() {
@@ -21,20 +21,26 @@ fn update(model, _msg) {
 }
 
 fn view(_model) {
+  landing_page()
+}
+
+fn landing_page() {
   div([], [
     nav([], [
       ul([], [
         li([], [text("About")]),
         li([], [text("Contact")]),
         li([], [text("Showcase")]),
-      ])
+      ]),
     ]),
     div([class("container")], [
       h1([], [text("Byte Club")]),
-      img([src("https://static.vecteezy.com/system/resources/thumbnails/002/412/377/small/coffee-cup-logo-coffee-shop-icon-design-free-vector.jpg")]),
-      div([class("content")], [
-        div([class("row-item")], [text(filler)]),
+      img([
+        src(
+          "https://static.vecteezy.com/system/resources/thumbnails/002/412/377/small/coffee-cup-logo-coffee-shop-icon-design-free-vector.jpg",
+        ),
       ]),
-    ])
+      div([class("content")], [div([class("row-item")], [text(filler)])]),
+    ]),
   ])
 }
