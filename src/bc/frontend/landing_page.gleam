@@ -10,7 +10,7 @@ pub fn main() {
   Nil
 }
 
-const filler = "Welcome to the ultimate hackathon experience! Join us for a weekend of innovation, collaboration, and creativity as we bring together the brightest minds in technology. Whether you're a seasoned coder or a first-time hacker, our hackathon offers a platform for you to showcase your skills, learn from industry experts, and build something amazing. Get ready to hack your way to success and unleash your potential. Don't miss out on this opportunity to network, compete, and make a difference. Register now and let the hacking begin!"
+const filler = "Welcome to the ultimate hackathon experience! Join us for a weekend of innovation, collaboration, and creativity as we bring together the brightest minds in technology. Whether you're a seasoned coder or a first-time hacker, our hackathon offers a platform for you to showcase your skills, learn from industry experts, and build something amazing. Get ready to hack your way to success and unleash your potential. Don't miss out on this opportunity to network, compete, and make a difference. Register now and let the hacking begin ..."
 
 fn init(_) {
   0
