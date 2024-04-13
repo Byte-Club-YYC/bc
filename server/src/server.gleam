@@ -1,7 +1,7 @@
+import bc/router
 import gleam/erlang/process
 import mist
 import wisp
-import bc/router
 
 pub fn main() {
   // This sets the logger to print INFO level logs, and other sensible defaults

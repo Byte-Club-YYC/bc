@@ -1,6 +1,5 @@
-import lustre
-import gleam/io
 import bc/landing_page
+import lustre
 
 pub fn main() {
   let app = landing_page.app()

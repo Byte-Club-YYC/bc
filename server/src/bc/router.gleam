@@ -1,7 +1,7 @@
-import wisp.{type Request, type Response}
-import gleam/string_builder
 import bc/web
+import gleam/string_builder
 import lustre/element.{to_string}
+import wisp.{type Request, type Response}
 
 /// The HTTP request handler- your application!
 ///

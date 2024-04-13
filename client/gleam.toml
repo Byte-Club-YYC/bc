@@ -16,8 +16,10 @@ version = "1.0.0"
 [dependencies]
 gleam_stdlib = "~> 0.34 or ~> 1.0"
 gleam_json = "~> 1.0"
-lustre = "4.0.0-rc.2"
 lustre_http = "~> 0.5"
+lustre = "~> 4.1"
+sketch = "~> 1.2"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
+lustre_dev_tools = ">= 1.2.0 and < 2.0.0"
