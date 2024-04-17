@@ -1,13 +1,16 @@
+import gleam/list
 import lustre
 import lustre/attribute.{class, src}
 import lustre/element.{text}
-import lustre/element/html.{a, div, h1, img, li, nav, ul}
+import lustre/element/html.{a, div, h1, img, li, nav, p, ul}
 import sketch
-
-const filler = "Welcome to the ultimate hackathon experience! Join us for a weekend of innovation, collaboration, and creativity as we bring together the brightest minds in technology. Whether you're a seasoned coder or a first-time hacker, our hackathon offers a platform for you to showcase your skills, learn from industry experts, and build something amazing. Get ready to hack your way to success and unleash your potential. Don't miss out on this opportunity to network, compete, and make a difference. Register now and let the hacking begin ..."
+import sketch/options as sketch_options
 
 pub fn app() {
-  lustre.simple(init, update, view)
+  let assert Ok(render) =
+    sketch_options.node()
+    |> sketch.lustre_setup()
+  lustre.simple(init, update, render(view))
 }
 
 pub fn init(_) {
@@ -51,33 +54,6 @@ fn nav_list_link() {
   |> sketch.to_lustre()
 }
 
-fn container() {
-  [
-    sketch.display("flex"),
-    sketch.flex_direction("column"),
-    sketch.align_items("center"),
-    sketch.border("1px solid black"),
-  ]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
-fn content() {
-  [
-    sketch.display("flex"),
-    sketch.flex_direction("row"),
-    sketch.justify_content("center"),
-  ]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
-fn row_item() {
-  [sketch.max_width_("50rem"), sketch.justify_content("center")]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
 fn top_bar() {
   nav([], [
     ul([nav_list()], [
@@ -96,13 +72,81 @@ fn top_bar() {
   ])
 }
 
+fn tldr() {
+  div([], [
+    h1([], [text("TL;DR")]),
+    text("The premise is simple"),
+    ul([], [
+      li([], [text("Go to a coffee shop or collaboration space")]),
+      li([], [text("Work on whatever project you've been wanting to work on")]),
+      li([], [text("Ask for help from others when you need it")]),
+      li([], [text("Give help to those who ask for it")]),
+    ]),
+    text(
+      "All skill levels and interests are welcome. It doesn't matter if you're an absolute beginner or a seasoned developer.",
+    ),
+  ])
+}
+
+fn wmro() {
+  [
+    h1([], [text("WM;RO (want more? read on)")]),
+    p([], [
+      text(
+        "
+The whole goal of this little group is to have a space and time to make progress on your
+coding side projects. This stems from the idea of body doubling where the social pressure
+of having others around you doing work will motivate you to also work. Folks with ADHD
+especially benefit from this type of work. (look up \"body doubling\" in the context of
+ADHD and productivity for more info)",
+      ),
+    ]),
+    p([], [
+      text(
+        "
+It won't only be heads down and working. We're leaving room for socializing, helping each
+other out and learning new things. One of the best ways to learn is to have an experienced
+person sit next to you while you work through problems and point out all the gotchas, mistakes,
+intricacies and conventions about whatever you're working on. This helps with that.",
+      ),
+    ]),
+    p([], [
+      text(
+        "
+So what do you need to know before coming? Nothing. All you need is a computer, an idea
+of what you'd like to work on or learn, and some curiosity.",
+      ),
+    ]),
+  ]
+}
+
 pub fn view(_model) {
+  let container_style =
+    [
+      sketch.display("flex"),
+      sketch.flex_direction("column"),
+      sketch.align_items("center"),
+      sketch.justify_content("center"),
+      sketch.max_width_("50rem"),
+    ]
+    |> sketch.class()
+    |> sketch.to_lustre()
+
   div([], [
     top_bar(),
-    div([container()], [
-      h1([], [text("Byte Club")]),
-      img([src("assets/byte-club-logo.jpg"), class("bc-round-img bc-big-img")]),
-      div([content()], [div([row_item()], [text(filler)])]),
-    ]),
+    div(
+      [container_style],
+      list.concat([
+        [
+          h1([], [text("Byte Club")]),
+          img([
+            src("assets/byte-club-logo.jpg"),
+            class("bc-round-img bc-big-img"),
+          ]),
+          tldr(),
+        ],
+        wmro(),
+      ]),
+    ),
   ])
 }
