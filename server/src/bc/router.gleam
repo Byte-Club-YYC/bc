@@ -1,16 +1,14 @@
 import bc/web
-import gleam/string_builder
-import lustre/element.{to_string}
-import wisp.{type Request, type Response}
+import gleam/io.{debug}
+import wisp.{type Request, type Response, File, response, set_body}
 
 /// The HTTP request handler- your application!
 ///
-pub fn handle_request(req: Request) -> Response {
+pub fn handle_request(req: Request, ctx: web.Context) -> Response {
   // Apply the middleware stack for this request/response.
-  use _req <- web.middleware(req)
+  use _req <- web.middleware(req, ctx)
 
-  let body = string_builder.from_string("Whoops! There's no frontend right now")
-
-  // Return a 200 OK response with the body and a HTML content type.
-  wisp.html_response(body, 200)
+  // Default to the index.html if nothing else is here.
+  response(200)
+  |> set_body(File(debug(ctx.static_directory <> "/index.html")))
 }
