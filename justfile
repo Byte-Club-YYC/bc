@@ -1,8 +1,10 @@
-watch:
-	watchexec -e gleam -r -w src just run
+build-client:
+	cd client; gleam run -m lustre/dev build app
 
-run:
-	gleam run
+run-server:
+	cd server; gleam run
 
 format:
-	gleam format
+	cd client; gleam format
+	cd server; gleam format
+

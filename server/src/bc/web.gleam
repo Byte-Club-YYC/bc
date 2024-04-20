@@ -1,5 +1,9 @@
 import wisp
 
+pub type Context {
+  Context(static_directory: String)
+}
+
 /// The middleware stack that the request handler uses. The stack is itself a
 /// middleware function!
 ///
@@ -12,6 +16,7 @@ import wisp
 ///
 pub fn middleware(
   req: wisp.Request,
+  ctx: Context,
   handle_request: fn(wisp.Request) -> wisp.Response,
 ) -> wisp.Response {
   // Permit browsers to simulate methods other than GET and POST using the
@@ -26,6 +31,7 @@ pub fn middleware(
 
   // Rewrite HEAD requests to GET requests and return an empty body.
   use req <- wisp.handle_head(req)
+  use <- wisp.serve_static(req, under: "/", from: ctx.static_directory)
 
   // Handle the request!
   handle_request(req)
