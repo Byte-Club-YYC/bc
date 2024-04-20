@@ -1,6 +1,0 @@
-watch:
-	watchexec -e gleam -r -w src just build
-
-build:
-	gleam run -m lustre build app
-

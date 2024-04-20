@@ -3,6 +3,12 @@
 
 - [ ] Better readme.md
 
+# Today
+
+- [ ] Write an intro to the club
+- [ ] Make a card element
+- [ ] Have a way to contact the organizers
+
 ## Front end stuff
 
 - [ ] Landing page
