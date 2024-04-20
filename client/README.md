@@ -1,3 +1,7 @@
+To run
+```sh
+gleam run -m lustre/dev build app
+```
 Cattpuccin colors for reference
 ```
 :root {

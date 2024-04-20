@@ -1,4 +1,3 @@
-import gleam/list
 import lustre
 import lustre/attribute.{class, src}
 import lustre/element.{text}
@@ -72,8 +71,14 @@ fn top_bar() {
   ])
 }
 
+fn content_style() {
+  [sketch.margin_("0 20% 0 20%"), sketch.align_items("left")]
+  |> sketch.class()
+  |> sketch.to_lustre()
+}
+
 fn tldr() {
-  div([], [
+  div([content_style()], [
     h1([], [text("TL;DR")]),
     text("The premise is simple"),
     ul([], [
@@ -89,7 +94,7 @@ fn tldr() {
 }
 
 fn wmro() {
-  [
+  div([content_style()], [
     h1([], [text("WM;RO (want more? read on)")]),
     p([], [
       text(
@@ -117,7 +122,7 @@ So what do you need to know before coming? Nothing. All you need is a computer, 
 of what you'd like to work on or learn, and some curiosity.",
       ),
     ]),
-  ]
+  ])
 }
 
 pub fn view(_model) {
@@ -127,26 +132,17 @@ pub fn view(_model) {
       sketch.flex_direction("column"),
       sketch.align_items("center"),
       sketch.justify_content("center"),
-      sketch.max_width_("50rem"),
     ]
     |> sketch.class()
     |> sketch.to_lustre()
 
   div([], [
     top_bar(),
-    div(
-      [container_style],
-      list.concat([
-        [
-          h1([], [text("Byte Club")]),
-          img([
-            src("assets/byte-club-logo.jpg"),
-            class("bc-round-img bc-big-img"),
-          ]),
-          tldr(),
-        ],
-        wmro(),
-      ]),
-    ),
+    div([container_style], [
+      h1([], [text("Byte Club")]),
+      img([src("assets/byte-club-logo.jpg"), class("bc-round-img bc-big-img")]),
+      tldr(),
+      wmro(),
+    ]),
   ])
 }
