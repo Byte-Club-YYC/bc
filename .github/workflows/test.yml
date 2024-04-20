@@ -18,7 +18,7 @@ jobs:
           gleam-version: "1.0.0"
           rebar3-version: "3"
           # elixir-version: "1.15.4"
-      - run-name: lint & format
+      - name: lint & format
       - run: |
           pushd server
           gleam deps download
