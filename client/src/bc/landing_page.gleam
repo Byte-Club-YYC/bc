@@ -1,23 +1,51 @@
+import gleam/dynamic
+import gleam/io.{debug}
+import gleam/option.{type Option, None, Some}
 import lustre
 import lustre/attribute.{class, src}
-import lustre/element.{text}
-import lustre/element/html.{a, div, h1, img, li, nav, p, ul}
+import lustre/effect.{type Effect}
+import lustre/element.{type Element, text}
+import lustre/element/html.{a, button, div, h1, img, li, nav, p, ul}
+import lustre/event
+import lustre_http.{type HttpError}
 import sketch
 import sketch/options as sketch_options
 
-pub fn app() {
-  let assert Ok(render) =
-    sketch_options.node()
-    |> sketch.lustre_setup()
-  lustre.simple(init, update, render(view))
+// Model
+pub type Model {
+  Model(ping: Option(Ping))
 }
 
-pub fn init(_) {
-  0
+pub type Ping {
+  Ping(ping: String)
 }
 
-pub fn update(model, _msg) {
-  model
+pub fn init(_) -> #(Model, Effect(Msg)) {
+  #(Model(ping: None), effect.none())
+}
+
+// Update
+
+pub opaque type Msg {
+  UserClickedPing
+  ApiUpdatedPing(Result(Ping, HttpError))
+}
+
+pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  debug(msg)
+  case msg {
+    UserClickedPing -> #(model, ping())
+    ApiUpdatedPing(Ok(ping)) -> #(Model(ping: Some(ping)), effect.none())
+    ApiUpdatedPing(Error(_)) -> #(model, effect.none())
+  }
+}
+
+fn ping() -> Effect(Msg) {
+  // fixme: use the real url here
+  let url = "http://localhost:8000/ping"
+  let decoder = dynamic.decode1(Ping, dynamic.field("ping", dynamic.string))
+
+  lustre_http.get(url, lustre_http.expect_json(decoder, ApiUpdatedPing))
 }
 
 fn nav_list() {
@@ -125,7 +153,7 @@ of what you'd like to work on or learn, and some curiosity.",
   ])
 }
 
-pub fn view(_model) {
+pub fn view(model: Model) -> Element(Msg) {
   let container_style =
     [
       sketch.display("flex"),
@@ -136,6 +164,10 @@ pub fn view(_model) {
     |> sketch.class()
     |> sketch.to_lustre()
 
+  let ping_content_div = case model.ping {
+    Some(val) -> div([], [text(val.ping)])
+    None -> text("Press the button to ping the server")
+  }
   div([], [
     top_bar(),
     div([container_style], [
@@ -143,6 +175,18 @@ pub fn view(_model) {
       img([src("assets/byte-club-logo.jpg"), class("bc-round-img bc-big-img")]),
       tldr(),
       wmro(),
+      ping_content_div,
+      button([event.on_click(UserClickedPing)], [text("Ping Server")]),
     ]),
   ])
+}
+
+// App
+
+pub fn app() {
+  let assert Ok(render) =
+    sketch_options.node()
+    |> sketch.lustre_setup()
+
+  lustre.application(init, update, render(view))
 }
