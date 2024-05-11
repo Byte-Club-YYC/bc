@@ -1,11 +1,38 @@
 import bc/router
-import bc/web.{Context}
+import bc/web.{type GithubSettings, Context, GithubSettings}
 import gleam/erlang/process
 import gleam/io.{debug}
 import mist
 import wisp
 
+import gleam/result.{map_error, replace_error, try}
+import glenvy/dotenv
+import glenvy/env
+
+pub fn github_settings() -> Result(GithubSettings, String) {
+  use _ <- try(map_error(dotenv.load(), fn(_) { "Unable to load .env file" }))
+  use github_secret <- try(replace_error(
+    env.get_string("GITHUB_OAUTH_CLIENT_SECRET"),
+    "Unable to load GITHUB_OAUTH_CLIENT_SECRET from environment variables",
+  ))
+  use github_client_id <- try(replace_error(
+    env.get_string("GITHUB_OAUTH_CLIENT_ID"),
+    "Unable to load GITHUB_OAUTH_CLIENT_ID from environment variables",
+  ))
+
+  Ok(GithubSettings(client_id: github_client_id, client_secret: github_secret))
+}
+
 pub fn main() {
+  let _ = dotenv.load()
+  let github_settings = case github_settings() {
+    Ok(settings) -> settings
+    Error(e) -> {
+      io.println("Unable to load github oauth settings: " <> e)
+      panic("Unable to load github oauth settings: " <> e)
+    }
+  }
+
   // This sets the logger to print INFO level logs, and other sensible defaults
   // for a web application.
   wisp.configure_logger()
@@ -15,7 +42,8 @@ pub fn main() {
   let secret_key_base = wisp.random_string(64)
 
   // A context is constructed holding the static directory path.
-  let ctx = Context(static_directory: static_directory())
+  let ctx =
+    Context(static_directory: static_directory(), github: github_settings)
 
   let handler = router.handle_request(_, ctx)
 
@@ -28,7 +56,7 @@ pub fn main() {
 
   // The web server runs in new Erlang process, so put this one to sleep while
   // it works concurrently.
-  process.sleep_forever()
+  Ok(process.sleep_forever())
 }
 
 pub fn static_directory() -> String {

@@ -1,7 +1,11 @@
 import wisp
 
+pub type GithubSettings {
+  GithubSettings(client_id: String, client_secret: String)
+}
+
 pub type Context {
-  Context(static_directory: String)
+  Context(static_directory: String, github: GithubSettings)
 }
 
 /// The middleware stack that the request handler uses. The stack is itself a
