@@ -1,5 +1,6 @@
 import gleam/dynamic
 import gleam/io.{debug}
+import gleam/json.{object}
 import gleam/option.{type Option, None, Some}
 import lustre
 import lustre/attribute.{class, src}
@@ -45,7 +46,11 @@ fn ping() -> Effect(Msg) {
   let url = "http://localhost:8000/ping"
   let decoder = dynamic.decode1(Ping, dynamic.field("ping", dynamic.string))
 
-  lustre_http.get(url, lustre_http.expect_json(decoder, ApiUpdatedPing))
+  lustre_http.post(
+    url,
+    object([]),
+    lustre_http.expect_json(decoder, ApiUpdatedPing),
+  )
 }
 
 fn nav_list() {

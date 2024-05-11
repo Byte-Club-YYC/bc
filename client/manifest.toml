@@ -42,10 +42,10 @@ packages = [
 ]
 
 [requirements]
-gleam_json = { version = "~> 1.0" }
+gleam_json = { version = ">= 1.0.0 and < 2.0.0"}
 gleam_stdlib = { version = "~> 0.34 or ~> 1.0" }
 gleeunit = { version = "~> 1.0" }
 lustre = { version = "~> 4.1" }
-lustre_dev_tools = { version = ">= 1.2.0 and < 2.0.0"}
+lustre_dev_tools = { version = ">= 1.2.0 and < 2.0.0" }
 lustre_http = { version = "~> 0.5" }
 sketch = { version = "~> 1.2" }

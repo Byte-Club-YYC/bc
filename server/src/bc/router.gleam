@@ -1,5 +1,5 @@
 import bc/web
-import gleam/http.{Get}
+import gleam/http
 import gleam/io.{debug}
 import gleam/json
 import wisp.{type Request, type Response, File, response, set_body}
@@ -18,14 +18,14 @@ pub fn handle_request(req: Request, ctx: web.Context) -> Response {
 }
 
 fn home_page(req: Request, ctx: web.Context) -> Response {
-  use <- wisp.require_method(req, Get)
+  use <- wisp.require_method(req, http.Get)
   // Default to the index.html if nothing else is here.
   response(200)
   |> set_body(File(debug(ctx.static_directory <> "/index.html")))
 }
 
 fn pong(req: Request) -> Response {
-  use <- wisp.require_method(req, Get)
+  use <- wisp.require_method(req, http.Post)
   json.object([#("ping", json.string("pong"))])
   |> json.to_string_builder()
   |> wisp.json_response(200)
