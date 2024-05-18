@@ -1,5 +1,4 @@
 import gleam/dynamic
-import gleam/io.{debug}
 import gleam/json.{object}
 import gleam/option.{type Option, None, Some}
 import lustre
@@ -11,6 +10,7 @@ import lustre/event
 import lustre_http.{type HttpError}
 import sketch
 import sketch/options as sketch_options
+import url
 
 // Model
 pub type Model {
@@ -33,7 +33,6 @@ pub opaque type Msg {
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
-  debug(msg)
   case msg {
     UserClickedPing -> #(model, ping())
     ApiUpdatedPing(Ok(ping)) -> #(Model(ping: Some(ping)), effect.none())
@@ -42,8 +41,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 fn ping() -> Effect(Msg) {
-  // fixme: use the real url here
-  let url = "http://localhost:8000/ping"
+  let url = url.server_url() <> "/ping"
   let decoder = dynamic.decode1(Ping, dynamic.field("ping", dynamic.string))
 
   lustre_http.post(
