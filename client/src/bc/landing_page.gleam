@@ -1,13 +1,15 @@
 import gleam/dynamic
-import gleam/json.{object}
+import gleam/json
 import gleam/option.{type Option, None, Some}
 import lustre
-import lustre/attribute
+import lustre/attribute as attr
 import lustre/effect.{type Effect}
-import lustre/element.{type Element, text}
+import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 import lustre/ui.{type Theme, Px, Rem, Size, Theme}
+import lustre/ui/layout/cluster
+import lustre/ui/prose
 import lustre/ui/util/colour
 import lustre/ui/util/styles
 import lustre_http.{type HttpError}
@@ -62,13 +64,13 @@ fn ping() -> Effect(Msg) {
 
   lustre_http.post(
     url,
-    object([]),
+    json.object([]),
     lustre_http.expect_json(decoder, ApiUpdatedPing),
   )
 }
 
 fn tldr() {
-  ui.prose([], [
+  ui.prose([prose.full()], [
     html.h1([], [html.text("TL;DR")]),
     html.text("The premise is simple"),
     html.ul([], [
@@ -86,7 +88,7 @@ fn tldr() {
 }
 
 fn wmro() {
-  ui.prose([], [
+  ui.prose([prose.full()], [
     html.h1([], [html.text("WM;RO (want more? read on)")]),
     html.p([], [
       html.text(
@@ -119,7 +121,7 @@ of what you'd like to work on or learn, and some curiosity.",
 
 pub fn view(model: Model) -> Element(Msg) {
   let ping_content_div = case model.ping {
-    Some(val) -> html.div([], [text(val.ping)])
+    Some(val) -> html.div([], [html.text(val.ping)])
     None -> html.text("Press the button to ping the server")
   }
 
@@ -128,16 +130,18 @@ pub fn view(model: Model) -> Element(Msg) {
   html.div([], [
     styles.elements(),
     styles.scoped(model.theme, "#container"),
-    ui.stack([attribute.id("container"), attribute.style(styles)], [
-      html.h1([], [html.text("Byte Club")]),
-      html.img([
-        attribute.src("assets/byte-club-logo.jpg"),
-        attribute.class("bc-round-img bc-big-img"),
+    ui.stack([attr.id("container"), attr.style(styles)], [
+      ui.cluster([cluster.stretch()], [
+        ui.prose([], [html.h1([], [html.text("Byte Club")])]),
+        html.img([
+          attr.src("assets/byte-club-logo.jpg"),
+          attr.class("bc-round-img bc-big-img"),
+        ]),
       ]),
       tldr(),
       wmro(),
       ping_content_div,
-      ui.button([event.on_click(UserClickedPing)], [text("Ping Server")]),
+      ui.button([event.on_click(UserClickedPing)], [html.text("Ping Server")]),
     ]),
   ])
 }
