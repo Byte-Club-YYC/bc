@@ -18,7 +18,7 @@ gleam_stdlib = "~> 0.34 or ~> 1.0"
 gleam_json = ">= 1.0.0 and < 2.0.0"
 lustre_http = "~> 0.5"
 lustre = "~> 4.1"
-sketch = "~> 1.2"
+lustre_ui = ">= 0.6.0 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
