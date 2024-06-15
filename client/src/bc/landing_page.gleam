@@ -1,20 +1,23 @@
 import gleam/dynamic
-import gleam/json.{object}
+import gleam/json
 import gleam/option.{type Option, None, Some}
 import lustre
-import lustre/attribute.{class, src}
+import lustre/attribute as attr
 import lustre/effect.{type Effect}
-import lustre/element.{type Element, text}
-import lustre/element/html.{a, button, div, h1, img, li, nav, p, ul}
+import lustre/element.{type Element}
+import lustre/element/html
 import lustre/event
+import lustre/ui.{type Theme, Px, Rem, Size, Theme}
+import lustre/ui/layout/cluster
+import lustre/ui/prose
+import lustre/ui/util/colour
+import lustre/ui/util/styles
 import lustre_http.{type HttpError}
-import sketch
-import sketch/options as sketch_options
 import url
 
 // Model
 pub type Model {
-  Model(ping: Option(Ping))
+  Model(theme: Theme, ping: Option(Ping))
 }
 
 pub type Ping {
@@ -22,7 +25,19 @@ pub type Ping {
 }
 
 pub fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model(ping: None), effect.none())
+  let theme =
+    Theme(
+      space: Size(base: Rem(1.5), ratio: 1.618),
+      text: Size(base: Rem(1.125), ratio: 1.215),
+      radius: Px(4.0),
+      primary: colour.iris(),
+      greyscale: colour.slate(),
+      error: colour.red(),
+      success: colour.green(),
+      warning: colour.yellow(),
+      info: colour.blue(),
+    )
+  #(Model(theme: theme, ping: None), effect.none())
 }
 
 // Update
@@ -35,7 +50,10 @@ pub opaque type Msg {
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     UserClickedPing -> #(model, ping())
-    ApiUpdatedPing(Ok(ping)) -> #(Model(ping: Some(ping)), effect.none())
+    ApiUpdatedPing(Ok(ping)) -> #(
+      Model(..model, ping: Some(ping)),
+      effect.none(),
+    )
     ApiUpdatedPing(Error(_)) -> #(model, effect.none())
   }
 }
@@ -46,89 +64,34 @@ fn ping() -> Effect(Msg) {
 
   lustre_http.post(
     url,
-    object([]),
+    json.object([]),
     lustre_http.expect_json(decoder, ApiUpdatedPing),
   )
 }
 
-fn nav_list() {
-  [
-    sketch.display("flex"),
-    sketch.flex_direction("row"),
-    sketch.align_items("center"),
-    sketch.list_style_type("none"),
-    sketch.padding_("0"),
-    sketch.margin_("0"),
-    sketch.display("inline"),
-  ]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
-fn nav_list_li() {
-  [
-    sketch.padding_("10px 20px"),
-    sketch.list_style_type("none"),
-    sketch.display("inline"),
-  ]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
-fn nav_list_link() {
-  [
-    sketch.text_decoration("none"),
-    sketch.hover([sketch.background("rgba(var(--ctp-mocha-base-rgb), 0.8)")]),
-  ]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
-fn top_bar() {
-  nav([], [
-    ul([nav_list()], [
-      li([nav_list_li()], [
-        a([], [
-          img([
-            src("assets/byte-club-logo.jpg"),
-            class("bc-round-img bc-tiny-img"),
-          ]),
-        ]),
-      ]),
-      li([nav_list_li()], [a([nav_list_link()], [text("About")])]),
-      li([nav_list_li()], [a([nav_list_link()], [text("Contact")])]),
-      li([nav_list_li()], [a([nav_list_link()], [text("Showcase")])]),
-    ]),
-  ])
-}
-
-fn content_style() {
-  [sketch.margin_("0 20% 0 20%"), sketch.align_items("left")]
-  |> sketch.class()
-  |> sketch.to_lustre()
-}
-
 fn tldr() {
-  div([content_style()], [
-    h1([], [text("TL;DR")]),
-    text("The premise is simple"),
-    ul([], [
-      li([], [text("Go to a coffee shop or collaboration space")]),
-      li([], [text("Work on whatever project you've been wanting to work on")]),
-      li([], [text("Ask for help from others when you need it")]),
-      li([], [text("Give help to those who ask for it")]),
+  ui.prose([prose.full()], [
+    html.h1([], [html.text("TL;DR")]),
+    html.text("The premise is simple"),
+    html.ul([], [
+      html.li([], [html.text("Go to a coffee shop or collaboration space")]),
+      html.li([], [
+        html.text("Work on whatever project you've been wanting to work on"),
+      ]),
+      html.li([], [html.text("Ask for help from others when you need it")]),
+      html.li([], [html.text("Give help to those who ask for it")]),
     ]),
-    text(
+    html.text(
       "All skill levels and interests are welcome. It doesn't matter if you're an absolute beginner or a seasoned developer.",
     ),
   ])
 }
 
 fn wmro() {
-  div([content_style()], [
-    h1([], [text("WM;RO (want more? read on)")]),
-    p([], [
-      text(
+  ui.prose([prose.full()], [
+    html.h1([], [html.text("WM;RO (want more? read on)")]),
+    html.p([], [
+      html.text(
         "
 The whole goal of this little group is to have a space and time to make progress on your
 coding side projects. This stems from the idea of body doubling where the social pressure
@@ -137,8 +100,8 @@ especially benefit from this type of work. (look up \"body doubling\" in the con
 ADHD and productivity for more info)",
       ),
     ]),
-    p([], [
-      text(
+    html.p([], [
+      html.text(
         "
 It won't only be heads down and working. We're leaving room for socializing, helping each
 other out and learning new things. One of the best ways to learn is to have an experienced
@@ -146,8 +109,8 @@ person sit next to you while you work through problems and point out all the got
 intricacies and conventions about whatever you're working on. This helps with that.",
       ),
     ]),
-    p([], [
-      text(
+    html.p([], [
+      html.text(
         "
 So what do you need to know before coming? Nothing. All you need is a computer, an idea
 of what you'd like to work on or learn, and some curiosity.",
@@ -157,29 +120,28 @@ of what you'd like to work on or learn, and some curiosity.",
 }
 
 pub fn view(model: Model) -> Element(Msg) {
-  let container_style =
-    [
-      sketch.display("flex"),
-      sketch.flex_direction("column"),
-      sketch.align_items("center"),
-      sketch.justify_content("center"),
-    ]
-    |> sketch.class()
-    |> sketch.to_lustre()
-
   let ping_content_div = case model.ping {
-    Some(val) -> div([], [text(val.ping)])
-    None -> text("Press the button to ping the server")
+    Some(val) -> html.div([], [html.text(val.ping)])
+    None -> html.text("Press the button to ping the server")
   }
-  div([], [
-    top_bar(),
-    div([container_style], [
-      h1([], [text("Byte Club")]),
-      img([src("assets/byte-club-logo.jpg"), class("bc-round-img bc-big-img")]),
+
+  let styles = [#("width", "80ch"), #("margin", "0 auto"), #("padding", "2rem")]
+
+  html.div([], [
+    styles.elements(),
+    styles.scoped(model.theme, "#container"),
+    ui.stack([attr.id("container"), attr.style(styles)], [
+      ui.cluster([cluster.stretch()], [
+        ui.prose([], [html.h1([], [html.text("Byte Club")])]),
+        html.img([
+          attr.src("assets/byte-club-logo.jpg"),
+          attr.class("bc-round-img bc-big-img"),
+        ]),
+      ]),
       tldr(),
       wmro(),
       ping_content_div,
-      button([event.on_click(UserClickedPing)], [text("Ping Server")]),
+      ui.button([event.on_click(UserClickedPing)], [html.text("Ping Server")]),
     ]),
   ])
 }
@@ -187,9 +149,5 @@ pub fn view(model: Model) -> Element(Msg) {
 // App
 
 pub fn app() {
-  let assert Ok(render) =
-    sketch_options.node()
-    |> sketch.lustre_setup()
-
-  lustre.application(init, update, render(view))
+  lustre.application(init, update, view)
 }
