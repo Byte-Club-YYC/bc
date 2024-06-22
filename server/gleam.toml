@@ -27,6 +27,8 @@ gleamsver = ">= 1.0.0 and < 2.0.0"
 gleamyshell = ">= 1.1.0 and < 2.0.0"
 dot_env = ">= 1.0.0 and < 2.0.0"
 valid = ">= 0.4.0 and < 1.0.0"
+birdie = { path = "../../birdie" }
 
 [dev-dependencies]
 gleeunit = ">= 1.1.2 and < 2.0.0"
+pprint = ">= 1.0.3 and < 2.0.0"

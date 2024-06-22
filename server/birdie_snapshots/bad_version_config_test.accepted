@@ -1,0 +1,10 @@
+---
+version: 1.1.6
+title: bad_version_config_test
+file: ./test/config_test.gleam
+test_name: bad_version_config_test
+---
+#(
+  "BC_VERSION must be a valid semver",
+  ["BC_VERSION must be a valid semver"],
+)

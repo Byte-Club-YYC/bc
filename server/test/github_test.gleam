@@ -1,6 +1,8 @@
 import bc/github.{Credentials, credentials_from_env}
+import birdie
 import dot_env/env
 import gleeunit/should
+import pprint
 
 pub fn both_empty_github_credentials_test() {
   env.set("BC_GITHUB_OAUTH_CLIENT_ID", "")
@@ -10,12 +12,8 @@ pub fn both_empty_github_credentials_test() {
 
   credentials_from_env()
   |> should.be_error()
-  |> should.equal(
-    #("BC_GITHUB_OAUTH_CLIENT_SECRET must not be empty", [
-      "BC_GITHUB_OAUTH_CLIENT_SECRET must not be empty",
-      "BC_GITHUB_OAUTH_CLIENT_ID must not be empty",
-    ]),
-  )
+  |> pprint.format
+  |> birdie.snap(title: "both_empty_github_credentials_test")
 }
 
 pub fn client_id_empty_github_credentials_test() {
@@ -26,11 +24,8 @@ pub fn client_id_empty_github_credentials_test() {
 
   credentials_from_env()
   |> should.be_error()
-  |> should.equal(
-    #("BC_GITHUB_OAUTH_CLIENT_ID must not be empty", [
-      "BC_GITHUB_OAUTH_CLIENT_ID must not be empty",
-    ]),
-  )
+  |> pprint.format
+  |> birdie.snap(title: "client_id_empty_github_credentials_test")
 }
 
 pub fn client_secret_empty_github_credentials_test() {
@@ -41,11 +36,8 @@ pub fn client_secret_empty_github_credentials_test() {
 
   credentials_from_env()
   |> should.be_error()
-  |> should.equal(
-    #("BC_GITHUB_OAUTH_CLIENT_SECRET must not be empty", [
-      "BC_GITHUB_OAUTH_CLIENT_SECRET must not be empty",
-    ]),
-  )
+  |> pprint.format
+  |> birdie.snap(title: "client_secret_empty_github_credentials_test")
 }
 
 pub fn both_set_github_credentials_test() {

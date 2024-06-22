@@ -1,8 +1,10 @@
 import bc/config.{Config}
 import bc/github.{Credentials}
+import birdie
 import dot_env/env
 import gleamsver
 import gleeunit/should
+import pprint
 
 pub fn empty_version_config_test() {
   env.set("BC_GITHUB_OAUTH_CLIENT_ID", "Heeyo ID")
@@ -14,9 +16,8 @@ pub fn empty_version_config_test() {
 
   config.from_env()
   |> should.be_error()
-  |> should.equal(
-    #("BC_VERSION must not be empty", ["BC_VERSION must not be empty"]),
-  )
+  |> pprint.format
+  |> birdie.snap(title: "empty_version_config_test")
 }
 
 pub fn bad_version_config_test() {
@@ -29,9 +30,8 @@ pub fn bad_version_config_test() {
 
   config.from_env()
   |> should.be_error()
-  |> should.equal(
-    #("BC_VERSION must be a valid semver", ["BC_VERSION must be a valid semver"]),
-  )
+  |> pprint.format
+  |> birdie.snap(title: "bad_version_config_test")
 }
 
 pub fn good_version_config_test() {
