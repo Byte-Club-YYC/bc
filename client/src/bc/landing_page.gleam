@@ -1,4 +1,6 @@
+import birl
 import gleam/dynamic
+import gleam/io
 import gleam/json
 import gleam/option.{type Option, None, Some}
 import lustre
@@ -17,11 +19,15 @@ import url
 
 // Model
 pub type Model {
-  Model(theme: Theme, ping: Option(Ping))
+  Model(theme: Theme, ping: Option(Ping), event: Event)
 }
 
 pub type Ping {
   Ping(ping: String)
+}
+
+pub type Event {
+  Event(location: String, date: birl.Time)
 }
 
 pub fn init(_) -> #(Model, Effect(Msg)) {
@@ -37,7 +43,14 @@ pub fn init(_) -> #(Model, Effect(Msg)) {
       warning: colour.yellow(),
       info: colour.blue(),
     )
-  #(Model(theme: theme, ping: None), effect.none())
+  #(
+    Model(
+      theme: theme,
+      ping: None,
+      event: Event(location: "", date: birl.now()),
+    ),
+    effect.none(),
+  )
 }
 
 // Update
@@ -45,6 +58,9 @@ pub fn init(_) -> #(Model, Effect(Msg)) {
 pub opaque type Msg {
   UserClickedPing
   ApiUpdatedPing(Result(Ping, HttpError))
+  UserUpdatedEventLocation(value: String)
+  UserUpdatedEventDate(value: String)
+  UserClickedEventSubmit
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -55,7 +71,27 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
     ApiUpdatedPing(Error(_)) -> #(model, effect.none())
+    UserUpdatedEventLocation(value) -> #(
+      Model(..model, event: Event(..model.event, location: value)),
+      effect.none(),
+    )
+    UserUpdatedEventDate(value) ->
+      case birl.parse(value) {
+        Ok(date) -> #(
+          Model(..model, event: Event(..model.event, date: date)),
+          effect.none(),
+        )
+        Error(_) -> #(model, effect.none())
+      }
+    UserClickedEventSubmit -> #(model, submit_event(model))
   }
+}
+
+fn submit_event(model: Model) -> Effect(Msg) {
+  io.print("woo!")
+  io.print(model.event.location)
+  io.print(birl.to_date_string(model.event.date))
+  effect.none()
 }
 
 fn ping() -> Effect(Msg) {
@@ -119,6 +155,21 @@ of what you'd like to work on or learn, and some curiosity.",
   ])
 }
 
+fn event_submission(model: Model) -> Element(Msg) {
+  ui.box([], [
+    ui.input([
+      attr.value(model.event.location),
+      event.on_input(UserUpdatedEventLocation),
+    ]),
+    ui.input([
+      attr.type_("date"),
+      attr.value(birl.to_naive_date_string(model.event.date)),
+      event.on_input(UserUpdatedEventDate),
+    ]),
+    ui.button([event.on_click(UserClickedEventSubmit)], [html.text("Submit")]),
+  ])
+}
+
 pub fn view(model: Model) -> Element(Msg) {
   let ping_content_div = case model.ping {
     Some(val) -> html.div([], [html.text(val.ping)])
@@ -142,6 +193,7 @@ pub fn view(model: Model) -> Element(Msg) {
       wmro(),
       ping_content_div,
       ui.button([event.on_click(UserClickedPing)], [html.text("Ping Server")]),
+      event_submission(model),
     ]),
   ])
 }
