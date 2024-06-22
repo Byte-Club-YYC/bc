@@ -1,11 +1,20 @@
+import bc/config
 import bc/router
 import bc/web.{Context}
+import dot_env as dot
 import gleam/erlang/process
 import gleam/io.{debug}
 import mist
 import wisp
 
 pub fn main() {
+  dot.new()
+  |> dot.set_path(".env")
+  |> dot.set_debug(True)
+  |> dot.load
+
+  let assert Ok(config) = config.from_env()
+
   // This sets the logger to print INFO level logs, and other sensible defaults
   // for a web application.
   wisp.configure_logger()
@@ -15,7 +24,7 @@ pub fn main() {
   let secret_key_base = wisp.random_string(64)
 
   // A context is constructed holding the static directory path.
-  let ctx = Context(static_directory: static_directory())
+  let ctx = Context(static_directory: static_directory(), config: config)
 
   let handler = router.handle_request(_, ctx)
 
@@ -29,6 +38,8 @@ pub fn main() {
   // The web server runs in new Erlang process, so put this one to sleep while
   // it works concurrently.
   process.sleep_forever()
+
+  Ok(Nil)
 }
 
 pub fn static_directory() -> String {
