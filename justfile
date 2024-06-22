@@ -1,3 +1,5 @@
+set dotenv-load
+
 build-client:
 	cd client; gleam run -m lustre/dev build app
 
@@ -7,4 +9,3 @@ run-server:
 format:
 	cd client; gleam format
 	cd server; gleam format
-

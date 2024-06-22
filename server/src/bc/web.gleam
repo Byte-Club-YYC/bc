@@ -1,7 +1,8 @@
+import bc/config
 import wisp
 
 pub type Context {
-  Context(static_directory: String)
+  Context(static_directory: String, config: config.Config)
 }
 
 /// The middleware stack that the request handler uses. The stack is itself a

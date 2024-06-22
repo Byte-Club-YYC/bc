@@ -14,8 +14,8 @@ version = "1.0.0"
 
 [dependencies]
 gleam_stdlib = "~> 0.34 or ~> 1.0"
-wisp = "~> 0.13"
-mist = "~> 0.17"
+wisp = "~> 0.15"
+mist = "~> 1.2.0"
 gleam_erlang = "~> 0.25"
 gleam_otp = "~> 0.10"
 glow_auth = "~> 0.4"
@@ -23,6 +23,12 @@ client = { path = "../client" }
 gleam_http = ">= 3.6.0 and < 4.0.0"
 gleam_json = ">= 1.0.1 and < 2.0.0"
 lustre_ui = ">= 0.6.0 and < 1.0.0"
+gleamsver = ">= 1.0.0 and < 2.0.0"
+gleamyshell = ">= 1.1.0 and < 2.0.0"
+dot_env = ">= 1.0.0 and < 2.0.0"
+valid = ">= 0.4.0 and < 1.0.0"
+birdie = { path = "../../birdie" }
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.1.2 and < 2.0.0"
+pprint = ">= 1.0.3 and < 2.0.0"
