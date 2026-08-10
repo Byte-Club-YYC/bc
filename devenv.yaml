@@ -1,0 +1,7 @@
+inputs:
+  # The siblings track devenv-nixpkgs/rolling. This one follows the same
+  # channel flake.nix does, deliberately: `gleam format` output depends on the
+  # gleam version, and `client-format`/`server-format` in the gate would start
+  # failing on code the shell had just formatted if the two drifted far apart.
+  nixpkgs:
+    url: github:NixOS/nixpkgs/nixpkgs-unstable

@@ -1,41 +1,53 @@
 import bc/router
 import bc/web.{Context}
+import envoy
 import gleam/erlang/process
-import gleam/io.{debug}
+import gleam/int
 import mist
 import wisp
+import wisp/wisp_mist
+
+const default_port = 8000
+
+const default_static_directory = "priv/static"
 
 pub fn main() {
-  // This sets the logger to print INFO level logs, and other sensible defaults
-  // for a web application.
   wisp.configure_logger()
 
-  // Here we generate a secret key, but in a real application you would want to
-  // load this from somewhere so that it is not regenerated on every restart.
+  // Regenerated per restart, invalidating every signed cookie from the last
+  // run. Nothing here signs anything that has to outlive a restart yet.
   let secret_key_base = wisp.random_string(64)
 
-  // A context is constructed holding the static directory path.
   let ctx = Context(static_directory: static_directory())
-
   let handler = router.handle_request(_, ctx)
 
-  // Start the Mist web server.
   let assert Ok(_) =
-    wisp.mist_handler(handler, secret_key_base)
+    handler
+    |> wisp_mist.handler(secret_key_base)
     |> mist.new
-    |> mist.port(8000)
-    |> mist.start_http
+    |> mist.port(port())
+    // Loopback would be unreachable from outside the container.
+    |> mist.bind("0.0.0.0")
+    |> mist.start
 
-  // The web server runs in new Erlang process, so put this one to sleep while
-  // it works concurrently.
   process.sleep_forever()
 }
 
-pub fn static_directory() -> String {
-  // The priv directory is where we store non-Gleam and non-Erlang files,
-  // including static assets to be served.
-  // This function returns an absolute path and works both in development and in
-  // production after compilation.
-  let assert Ok(priv_directory) = wisp.priv_directory("client")
-  debug(priv_directory <> "/static")
+fn static_directory() -> String {
+  case envoy.get("STATIC_DIRECTORY") {
+    Ok(directory) -> directory
+    Error(_) -> default_static_directory
+  }
+}
+
+/// Crashes on an unreadable PORT rather than falling back -- listening
+/// somewhere other than where it was told is worse than refusing to start.
+fn port() -> Int {
+  case envoy.get("PORT") {
+    Error(_) -> default_port
+    Ok(value) -> {
+      let assert Ok(port) = int.parse(value)
+      port
+    }
+  }
 }

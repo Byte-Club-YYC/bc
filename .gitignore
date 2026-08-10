@@ -1,0 +1,37 @@
+# === Gleam ===
+build/
+*.beam
+*.ez
+erl_crash.dump
+
+# === Generated client bundle ===
+# Written by `build-client`; flake.nix builds its own copy in the sandbox.
+client/priv/static/client.mjs
+
+# === Nix ===
+result
+result-*
+
+# === Devenv ===
+.devenv/
+.devenv.flake.nix
+devenv.local.nix
+
+# === Environment ===
+.env
+.env.*
+!.env.example
+
+# === AI / Tooling ===
+.claude/
+
+# === Editors ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db

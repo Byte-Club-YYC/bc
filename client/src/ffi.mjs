@@ -2,9 +2,14 @@ import { Ok, Error } from "./gleam.mjs";
 import { Some, None } from "../gleam_stdlib/gleam/option.mjs";
 import { Uri } from "../gleam_stdlib/gleam/uri.mjs";
 
-const initial_location = window.location.href
+// On first call rather than at module load, so the module stays importable
+// without a `window` -- which is what `gleam test` under node is.
+let initial_location = undefined;
 
 export const initial_uri = () => {
+  if (initial_location === undefined) {
+    initial_location = window.location.href;
+  }
   return uri_from_url(new URL(initial_location));
 };
 
