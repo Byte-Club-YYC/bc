@@ -1,5 +1,20 @@
+# Each package formats from its own directory -- there is no gleam project at
+# the repository root, which is why the previous version of this file never
+# worked. gleam comes from the devenv shell, hence the guard.
 pre-commit:
+  parallel: true
   commands:
-    formatter:
-      glob: "*.gleam"
-      run: gleam format --check
+    format-client:
+      root: client/
+      glob: "client/**/*.gleam"
+      run: |
+        command -v gleam >/dev/null \
+          || { echo "gleam is not on PATH — commit from the devenv shell ('direnv allow', or 'devenv shell')"; exit 1; }
+        gleam format --check src test
+    format-server:
+      root: server/
+      glob: "server/**/*.gleam"
+      run: |
+        command -v gleam >/dev/null \
+          || { echo "gleam is not on PATH — commit from the devenv shell ('direnv allow', or 'devenv shell')"; exit 1; }
+        gleam format --check src test
